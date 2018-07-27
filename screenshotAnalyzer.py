@@ -4,6 +4,70 @@ Created on Mon May  7 10:30:08 2018
 
 @author: parit
 """
+import cv2
+import numpy as np
+from time import sleep
+kernel = np.ones((2,2),np.uint8)
+img = cv2.imread('/home/shaaran/Pictures/Screenshot from 2018-07-26 23-42-44.png')
+cnv_img  =cv2.cvtColor(img,cv2.COLOR_BGR2HSV)
+
+#PRE PROCESSING
+
+#--------------------------------------------
+#for theory classes
+def theory_class():
+    low_range_theory_green  = np.array([10,150,254])
+    high_range_theory_green = np.array([255,255,255])
+    mask_green = cv2.inRange(cnv_img,low_range_theory_green,high_range_theory_green)
+    #dilation = cv2.dilate(mask_green,kernel,iterations=1)
+    eroder = cv2.erode(mask_green,kernel,iterations=1)
+    reduce_opening = cv2.morphologyEx(eroder,cv2.MORPH_OPEN,kernel)
+    res = cv2.bitwise_and(img,img,mask=reduce_opening)
+    while True:
+        cv2.imshow('ffcs_hsv', res)
+        if cv2.waitKey(0):
+            break
+    cv2.destroyAllWindows()
+
+#for lab slots classes
+def lab_slots():
+    low_range_lab  = np.array([25,80,250])
+    high_range_lab = np.array([30,255,255])
+    mask_lab = cv2.inRange(cnv_img,low_range_lab,high_range_lab)
+    #dilation_lab = cv2.dilate(mask_lab,kernel,iterations=1)
+    eroder_lab = cv2.erode(mask_lab,kernel,iterations=1)
+    reduce_opening_lab = cv2.morphologyEx(eroder_lab,cv2.MORPH_OPEN,kernel)
+    res_lab = cv2.bitwise_and(img,img,mask=reduce_opening_lab)
+    while True:
+        cv2.imshow('ffcs_hsv', res_lab)
+        if cv2.waitKey(0):
+            break
+    cv2.destroyAllWindows()
+
+def line_detect():
+    import numpy as np
+    import cv2
+
+
+
+    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    edges = cv2.Canny(gray, 50, 250, apertureSize=3)
+    print(img.shape[1])
+    print(img.shape)
+    minLineLength = img.shape[1] - 300
+    lines = cv2.HoughLinesP(image=edges, rho=0.02, theta=np.pi / 500, threshold=10, lines=np.array([]),
+                            minLineLength=minLineLength, maxLineGap=100)
+
+    a, b, c = lines.shape
+    for i in range(a):
+        cv2.line(img, (lines[i][0][0], lines[i][0][1]), (lines[i][0][2], lines[i][0][3]), (0, 0, 255), 3, cv2.LINE_AA)
+
+    cv2.imshow('edges', edges)
+    cv2.imshow('result', img)
+
+    cv2.waitKey(0)
+    cv2.destroyAllWindows()
+
 
 
 def findFirstBlock ( array , colors):
@@ -50,7 +114,7 @@ def convertImage2json( filename ):
     
     
     from PIL import Image
-    import numpy as np
+    
     
     
     a = Image.open("test\\test images\\" + filename )
